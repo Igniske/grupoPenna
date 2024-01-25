@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Obtener PDF</title>
+</head>
+<body>
+  <h1>Obtener PDF y Título</h1>
+  <label for="pdfName">Ingrese el nombre del PDF:</label>
+  <input type="text" id="pdfName">
+  <button onclick="getPdfAndTitle()">Obtener PDF y Título</button>
+
+  <div id="pdfContainer"></div>
+
+  <script>
+    async function getPdfAndTitle() {
+      const pdfNameInput = document.getElementById('pdfName');
+      const pdfName = pdfNameInput.value.trim();
+
+      if (!pdfName) {
+        alert('Por favor, ingrese un nombre de PDF.');
+        return;
+      }
+
+      try {
+        // Obtener el título del PDF
+        const titleResponse = await fetch(`http://localhost:3001/api/prueba/pdf/name/${pdfName}`);
+        const titleData = await titleResponse.json();
+        const title = titleData.title;
+
+        // Obtener el PDF
+        const pdfResponse = await fetch(`http://localhost:3001/api/prueba/pdf/${titleData.id}`);
+        const pdfBlob = await pdfResponse.blob();
+
+        // Crear un objeto URL para el Blob del PDF
+        const pdfUrl = URL.createObjectURL(pdfBlob);
+
+        // Crear un enlace para descargar el PDF
+        const downloadLink = document.createElement('a');
+        downloadLink.href = pdfUrl;
+        downloadLink.download = `${title}.pdf`;
+        downloadLink.textContent = `Descargar ${title}.pdf`;
+
+        // Agregar el enlace al contenedor
+        const pdfContainer = document.getElementById('pdfContainer');
+        pdfContainer.innerHTML = '';
+        pdfContainer.appendChild(downloadLink);
+
+      } catch (error) {
+        console.error('Error de red:', error);
+        alert('Error al obtener el PDF y el título.');
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cargar Imagen</title>
+</head>
+<body>
+  <h1>Cargar Imagen</h1>
+  <form id="uploadForm" action="http://localhost:3001/api/prueba/image" method="post" enctype="multipart/form-data">
+    <label for="imageFile">Seleccionar imagen (jpg, jpeg, png):</label>
+    <input type="file" name="imageFile" id="imageFile" accept=".jpg, .jpeg, .png" required>
+    
+    <button type="submit">Subir Imagen</button>
+  </form>
+
+  <script>
+    const form = document.getElementById('uploadForm');
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+
+      const imageFileInput = document.getElementById('imageFile');
+      const file = imageFileInput.files[0];
+
+      // Verificar si se seleccionó un archivo
+      if (!file) {
+        alert('Por favor, seleccione un archivo de imagen.');
+        return;
+      }
+
+      // Verificar si el archivo es de tipo imagen (jpg, jpeg, png)
+      if (!file.type.includes('image')) {
+        alert('El archivo seleccionado no es una imagen válida.');
+        return;
+      }
+
+      // Verificar la extensión de la imagen
+      const allowedExtensions = ['.jpg', '.jpeg', '.png'];
+      const extension = file.name.split('.').pop().toLowerCase();
+      if (!allowedExtensions.includes(`.${extension}`)) {
+        alert('La imagen debe tener una extensión válida: jpg, jpeg, png.');
+        return;
+      }
+
+      const formData = new FormData(form);
+
+      try {
+        const response = await fetch(form.action, {
+          method: 'POST',
+          body: formData,
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          alert('Imagen cargada correctamente.');
+        } else {
+          alert('Error al cargar la imagen.');
+        }
+      } catch (error) {
+        console.error('Error de red:', error);
+      }
+    });
+  </script>
+</body>
+</html>

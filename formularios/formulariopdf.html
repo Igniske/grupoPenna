@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cargar PDF</title>
+</head>
+<body>
+  <h1>Cargar PDF</h1>
+  <form id="uploadForm" action="http://localhost:3001/api/prueba/pdf" method="post" enctype="multipart/form-data">
+    <label for="pdfFile">Seleccionar archivo PDF:</label>
+    <input type="file" name="pdfFile" id="pdfFile" accept=".pdf" required>
+    
+    <button type="submit">Subir PDF</button>
+  </form>
+
+  <script>
+    const form = document.getElementById('uploadForm');
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+
+      const pdfFileInput = document.getElementById('pdfFile');
+      const file = pdfFileInput.files[0];
+
+      // Verificar si se seleccionó un archivo
+      if (!file) {
+        alert('Por favor, seleccione un archivo PDF.');
+        return;
+      }
+
+      // Verificar si el archivo es de tipo PDF
+      if (!file.type.includes('pdf')) {
+        alert('El archivo seleccionado no es un PDF.');
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('pdfFile', file);
+
+      try {
+        const response = await fetch(form.action, {
+          method: 'POST',
+          body: formData,
+        });
+
+        if (!response.ok) {
+          throw new Error(`Error al cargar el PDF: ${response.statusText}`);
+        }
+
+        const result = await response.json();
+
+        if (result.success) {
+          alert('PDF cargado correctamente.');
+        } else {
+          alert('Error al cargar el PDF.');
+        }
+      } catch (error) {
+        console.error('Error de red:', error.message);
+        alert('Hubo un error al enviar el formulario.');
+      }
+    });
+  </script>
+</body>
+</html>
